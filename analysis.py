@@ -1,15 +1,23 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
+import os
 
 # Você está vendo isso no DataBricks?
-databricks = True
+databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
+
+if databricks:
+    path_sales = "/Volumes/rocket_lab/default/rocket_lab/sales_data_sample.csv"
+    path_continents = "/Volumes/rocket_lab/default/rocket_lab/continents.csv"
+else:
+    path_sales = "sales_data_sample.csv"
+    path_continents = "continents.csv"
 
 # Inicialização
 spark = SparkSession.builder.appName("GlobalTech_Sales_Analysis").getOrCreate()
 
 # Leitura dos dados
-df_sales = spark.read.csv("sales_data_sample.csv", header=True, inferSchema=True)
-df_continents = spark.read.csv("continents.csv", header=True, inferSchema=True)
+df_sales = spark.read.csv(path_sales, header=True, inferSchema=True)
+df_continents = spark.read.csv(path_continents, header=True, inferSchema=True)
 
 # Preparação da tabela
 df_sales = df_sales.withColumn("TOTALVALUE", F.col("QUANTITYORDERED") * F.col("PRICEEACH")) # Coluna de valor total
